@@ -1,29 +1,20 @@
-//
-//  ViewController.swift
-//  WebRTC
-//
-//  Created by Stasel on 20/05/2018.
-//  Copyright © 2018 Stasel. All rights reserved.
-//
-
-import UIKit
 import AVFoundation
+import UIKit
 import WebRTC
 
 class MainViewController: UIViewController {
-
-    private let signalClient: SignalingClient
     private let webRTCClient: WebRTCClient
+    private let janusSession: JanusSession
     private lazy var videoViewController = VideoViewController(webRTCClient: self.webRTCClient)
     
-    @IBOutlet private weak var speakerButton: UIButton?
-    @IBOutlet private weak var signalingStatusLabel: UILabel?
-    @IBOutlet private weak var localSdpStatusLabel: UILabel?
-    @IBOutlet private weak var localCandidatesLabel: UILabel?
-    @IBOutlet private weak var remoteSdpStatusLabel: UILabel?
-    @IBOutlet private weak var remoteCandidatesLabel: UILabel?
-    @IBOutlet private weak var muteButton: UIButton?
-    @IBOutlet private weak var webRTCStatusLabel: UILabel?
+    @IBOutlet private var speakerButton: UIButton?
+    @IBOutlet private var signalingStatusLabel: UILabel?
+    @IBOutlet private var localSdpStatusLabel: UILabel?
+    @IBOutlet private var localCandidatesLabel: UILabel?
+    @IBOutlet private var remoteSdpStatusLabel: UILabel?
+    @IBOutlet private var remoteCandidatesLabel: UILabel?
+    @IBOutlet private var muteButton: UIButton?
+    @IBOutlet private var webRTCStatusLabel: UILabel?
     
     private var signalingConnected: Bool = false {
         didSet {
@@ -74,7 +65,7 @@ class MainViewController: UIViewController {
     
     private var speakerOn: Bool = false {
         didSet {
-            let title = "Speaker: \(self.speakerOn ? "On" : "Off" )"
+            let title = "Speaker: \(self.speakerOn ? "On" : "Off")"
             self.speakerButton?.setTitle(title, for: .normal)
         }
     }
@@ -87,8 +78,8 @@ class MainViewController: UIViewController {
     }
     
     init(signalClient: SignalingClient, webRTCClient: WebRTCClient) {
-        self.signalClient = signalClient
         self.webRTCClient = webRTCClient
+        self.janusSession = JanusSession(url: "https://janus.conf.meetecho.com/janus")
         super.init(nibName: String(describing: MainViewController.self), bundle: Bundle.main)
     }
     
@@ -109,21 +100,23 @@ class MainViewController: UIViewController {
         self.webRTCStatusLabel?.text = "New"
         
         self.webRTCClient.delegate = self
-        self.signalClient.delegate = self
-        self.signalClient.connect()
+        self.janusSession.delegate = self
+        runStreamingPluginSequence()
     }
     
     @IBAction private func offerDidTap(_ sender: UIButton) {
-        self.webRTCClient.offer { (sdp) in
-            self.hasLocalSdp = true
-            self.signalClient.send(sdp: sdp)
+        self.janusSession.SendWatchRequest(streamId: 1) { error in
+            print("Watch offer finished, error: \(String(describing: error))")
         }
     }
     
     @IBAction private func answerDidTap(_ sender: UIButton) {
-        self.webRTCClient.answer { (localSdp) in
+        self.webRTCClient.answer { localSdp in
             self.hasLocalSdp = true
-            self.signalClient.send(sdp: localSdp)
+            self.janusSession.SendStartCommand(sdp: localSdp.sdp, completion: { error in
+                print("Start request finished, error: \(String(describing: error))")
+                self.startingEventReceived()
+            })
         }
     }
     
@@ -138,7 +131,7 @@ class MainViewController: UIViewController {
     }
     
     @IBAction private func videoDidTap(_ sender: UIButton) {
-        self.present(videoViewController, animated: true, completion: nil)
+        self.present(self.videoViewController, animated: true, completion: nil)
     }
     
     @IBAction private func muteDidTap(_ sender: UIButton) {
@@ -155,7 +148,7 @@ class MainViewController: UIViewController {
         let alert = UIAlertController(title: "Send a message to the other peer",
                                       message: "This will be transferred over WebRTC data channel",
                                       preferredStyle: .alert)
-        alert.addTextField { (textField) in
+        alert.addTextField { textField in
             textField.placeholder = "Message to send"
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -169,35 +162,14 @@ class MainViewController: UIViewController {
     }
 }
 
-extension MainViewController: SignalClientDelegate {
-    func signalClientDidConnect(_ signalClient: SignalingClient) {
-        self.signalingConnected = true
-    }
-    
-    func signalClientDidDisconnect(_ signalClient: SignalingClient) {
-        self.signalingConnected = false
-    }
-    
-    func signalClient(_ signalClient: SignalingClient, didReceiveRemoteSdp sdp: RTCSessionDescription) {
-        print("Received remote sdp")
-        self.webRTCClient.set(remoteSdp: sdp) { (error) in
-            self.hasRemoteSdp = true
-        }
-    }
-    
-    func signalClient(_ signalClient: SignalingClient, didReceiveCandidate candidate: RTCIceCandidate) {
-        print("Received remote candidate")
-        self.remoteCandidateCount += 1
-        self.webRTCClient.set(remoteCandidate: candidate)
-    }
-}
-
 extension MainViewController: WebRTCClientDelegate {
-    
     func webRTCClient(_ client: WebRTCClient, didDiscoverLocalCandidate candidate: RTCIceCandidate) {
         print("discovered local candidate")
-        self.localCandidateCount += 1
-        self.signalClient.send(candidate: candidate)
+        self.janusSession.SendLocalCandidate(candidate: candidate.sdp,
+                                             sdpMLineIndex: candidate.sdpMLineIndex,
+                                             sdpMid: candidate.sdpMid!) { _ in
+            self.localCandidateCount += 1
+        }
     }
     
     func webRTCClient(_ client: WebRTCClient, didChangeConnectionState state: RTCIceConnectionState) {
@@ -230,3 +202,26 @@ extension MainViewController: WebRTCClientDelegate {
     }
 }
 
+extension MainViewController: JanusSessionDelegate {
+    func runStreamingPluginSequence() {
+        self.janusSession.CreaseStreamingPluginSession { result in
+            if result {
+                self.signalingConnected = true
+            }
+        }
+    }
+    
+    func offerReceived(sdp: String) {
+        self.webRTCClient.set(remoteSdp: RTCSessionDescription(type: .offer, sdp: sdp)) { _ in
+            self.hasRemoteSdp = true
+        }
+    }
+    
+    func trickleReceived(trickle: JanusTrickleCandidate) {
+        print("trickle received")
+    }
+    
+    func startingEventReceived() {
+        print("starting event")
+    }
+}

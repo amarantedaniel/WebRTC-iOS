@@ -25,6 +25,7 @@
 		795A4A2A221E0FB100F8BB03 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795A4A29221E0FB100F8BB03 /* Message.swift */; };
 		798FBA472200F681009F525E /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 798FBA462200F681009F525E /* MainViewController.xib */; };
 		798FBA492200F9A9009F525E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 798FBA482200F9A9009F525E /* LaunchScreen.storyboard */; };
+		98AEEBFB24AE298300F4A687 /* Janus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98AEEBFA24AE298300F4A687 /* Janus.swift */; };
 		A3736211ED520122E5DBF999 /* libPods-WebRTC-Demo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27F59EEC794858CDDF75D2F2 /* libPods-WebRTC-Demo.a */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +52,7 @@
 		795A4A29221E0FB100F8BB03 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		798FBA462200F681009F525E /* MainViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainViewController.xib; sourceTree = "<group>"; };
 		798FBA482200F9A9009F525E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		98AEEBFA24AE298300F4A687 /* Janus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Janus.swift; sourceTree = "<group>"; };
 		9ED93846F4CF300F5D5F104C /* Pods-WebRTC.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WebRTC.debug.xcconfig"; path = "Pods/Target Support Files/Pods-WebRTC/Pods-WebRTC.debug.xcconfig"; sourceTree = "<group>"; };
 		A930FC9FB2A066EE0A3E2176 /* Pods-WebRTC.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WebRTC.release.xcconfig"; path = "Pods/Target Support Files/Pods-WebRTC/Pods-WebRTC.release.xcconfig"; sourceTree = "<group>"; };
 		CA606D7CF8E980599582389C /* libPods-WebRTC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WebRTC.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -179,12 +181,21 @@
 		798FBA452200F519009F525E /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				98AEEBF924AE297600F4A687 /* Janus */,
 				2F7EBC3422DCC6300015B46E /* WebSocketProvider */,
 				79177C9820B0DF2700BCD399 /* SignalingClient.swift */,
 				79177C9620B0DE7A00BCD399 /* WebRTCClient.swift */,
 				795A4A29221E0FB100F8BB03 /* Message.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		98AEEBF924AE297600F4A687 /* Janus */ = {
+			isa = PBXGroup;
+			children = (
+				98AEEBFA24AE298300F4A687 /* Janus.swift */,
+			);
+			path = Janus;
 			sourceTree = "<group>";
 		};
 		CFB6FD6BADE7DD44D7F5D315 /* Frameworks */ = {
@@ -328,6 +339,7 @@
 				79177C9720B0DE7A00BCD399 /* WebRTCClient.swift in Sources */,
 				2F7EBC3822DCCB4E0015B46E /* StarscreamProvider.swift in Sources */,
 				2F7EBC3A22DCCE240015B46E /* NativeWebSocket.swift in Sources */,
+				98AEEBFB24AE298300F4A687 /* Janus.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,13 +471,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = J5HXNWPVL8;
+				DEVELOPMENT_TEAM = 6425JYU666;
 				INFOPLIST_FILE = "$(SRCROOT)/SupportingFiles/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.stasel.WebRTC;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tigerhood.WebRTC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -481,13 +493,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = J5HXNWPVL8;
+				DEVELOPMENT_TEAM = 6425JYU666;
 				INFOPLIST_FILE = "$(SRCROOT)/SupportingFiles/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.stasel.WebRTC;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tigerhood.WebRTC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;

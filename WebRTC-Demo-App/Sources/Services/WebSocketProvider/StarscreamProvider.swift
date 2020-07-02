@@ -10,7 +10,6 @@ import Foundation
 import Starscream
 
 class StarscreamWebSocket: WebSocketProvider {
-
     var delegate: WebSocketProviderDelegate?
     private let socket: WebSocket
     
@@ -44,6 +43,4 @@ extension StarscreamWebSocket: Starscream.WebSocketDelegate {
     func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
         self.delegate?.webSocket(self, didReceiveData: data)
     }
-    
-    
 }
