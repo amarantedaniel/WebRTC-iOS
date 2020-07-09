@@ -154,7 +154,6 @@ final class WebRTCClient: NSObject {
         let videoTrack = self.createVideoTrack()
         self.localVideoTrack = videoTrack
         self.peerConnection.add(videoTrack, streamIds: [streamId])
-        self.remoteVideoTrack = self.peerConnection.transceivers.first { $0.mediaType == .video }?.receiver.track as? RTCVideoTrack
         
         // Data
         if let dataChannel = createDataChannel() {
@@ -205,6 +204,16 @@ extension WebRTCClient: RTCPeerConnectionDelegate {
         debugPrint("peerConnection new signaling state: \(stateChanged)")
     }
     
+    func peerConnection(_ peerConnection: RTCPeerConnection, didStartReceivingOn transceiver: RTCRtpTransceiver) {
+        switch transceiver.mediaType {
+        case .video:
+            self.remoteVideoTrack = transceiver.receiver.track as? RTCVideoTrack
+        default:
+            break
+        }
+        debugPrint("did start receiving on tranceiver?")
+    }
+        
     func peerConnection(_ peerConnection: RTCPeerConnection, didAdd stream: RTCMediaStream) {
         debugPrint("peerConnection did add stream")
     }
